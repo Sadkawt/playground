@@ -1,0 +1,23 @@
+#Title1
+{   
+    font-size: 72px;
+    text-align: center;
+    padding-top: 100px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.Divider
+{
+    
+}
+
+.icon
+{
+    width: 100px;
+    height: 100px;
+}
+
+.project
+{
+    text-align: center;
+}
