@@ -342,7 +342,9 @@ function checkCollision() {
 function spawnBall()
 {
     const newBall = new Ball();
+    newBall.radius = ballList[0].radius;
     ballList.push(newBall);
+    
 }
 
 
