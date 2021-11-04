@@ -78,6 +78,19 @@ class Ball{
         }
         return 0;
     }
+
+    grow()
+    {
+        this.radius += 5;
+    }
+
+    shrink()
+    {
+        if (this.radius > 5)
+        {
+            this.radius -= 5;            
+        }
+    }
 }
 
 class Paddel{
@@ -182,9 +195,11 @@ function drawGame(){
         clearScreen(); 
         if (running == true)
         {
-
-            ball.update();
-            ball.draw();
+            for (var i = 0; i < ballList.length; i++)
+            {
+                ballList[i].update();
+                ballList[i].draw();
+            }
             paddel1.update();
             paddel2.update();
             checkCollision();
@@ -193,33 +208,39 @@ function drawGame(){
         paddel2.draw();
         counter.draw();
 
-        var state = ball.outOfBounds();
-        if (state != 0)
+
+        for (var i = 0; i < ballList.length; i++)
         {
-            counter.update(state);
-            state = 0;
-            if (counter.p1 > 2 || counter.p2 > 2)
+            var state = ballList[i].outOfBounds();
+            if (state != 0)
             {
-                gameWon = true;
-                if (counter.p1 > counter.p2)
+                counter.update(state);
+                state = 0;
+                if (counter.p1 > 9 || counter.p2 > 9)
                 {
-                    winner = 1;
-                }
-                else
-                {
-                    winner = 2;
+                    gameWon = true;
+                    if (counter.p1 > counter.p2)
+                    {
+                        winner = 1;
+                    }
+                    else
+                    {
+                        winner = 2;
+                    }
                 }
             }
         }
+        
     }
     else
     {
         if (winner == 1)
         {
+            clearScreen(); 
             counter.draw();
             ctx.fillStyle = "white";
             ctx.fillText("SPELARE 1 HAR VUNNIT (Gratis båga)", 20, 400);
-            counter.reset();
+            ballList = [new Ball()];
 
         }
 
@@ -228,7 +249,7 @@ function drawGame(){
             counter.draw();
             ctx.fillStyle = "white";
             ctx.fillText("SPELARE 2 HAR VUNNIT (Gratis båga)", 20, 400);
-            counter.reset();
+            ballList = [new Ball()];
         }
     }
 }
@@ -257,7 +278,31 @@ function keyDown(event) {
     else if (event.keyCode == 13)
     {
         running = true;
+        if (gameWon == true)
+        {
+            counter.reset();
+        }
         gameWon = false;
+    }
+    else if (event.keyCode == 85)
+    {
+        spawnBall();
+    }
+
+    else if (event.keyCode == 54)
+    {
+        for (var i = 0; i < ballList.length; i++)
+        {
+            ballList[i].shrink();
+        }
+    }
+
+    else if (event.keyCode == 55)
+    {
+        for (var i = 0; i < ballList.length; i++)
+        {
+            ballList[i].grow();
+        }
     }
 }
 
@@ -277,15 +322,27 @@ function keyUp(event) {
 }
 
 function checkCollision() {
-    if (ball.x < paddel1.width && (ball.y + ball.radius > paddel1.y && paddel1.y + paddel1. height > ball.y - ball.radius))
-    {
-        ball.bounce(paddel1.width + ball.radius)
-    } 
 
-    if (ball.x > canvas.width - paddel2.width && (ball.y + ball.radius > paddel2.y && paddel2.y + paddel2. height > ball.y - ball.radius))
+    for (var i = 0; i < ballList.length; i++)
     {
-        ball.bounce(canvas.width - paddel2.width - ball.radius)
-    } 
+
+        if (ballList[i].x - ballList[i].radius < paddel1.width && (ballList[i].y + ballList[i].radius > paddel1.y && paddel1.y + paddel1. height > ballList[i].y - ballList[i].radius))
+        {
+            ballList[i].bounce(paddel1.width + ballList[i].radius)
+        } 
+    
+        if (ballList[i].x + ballList[i].radius > canvas.width - paddel2.width && (ballList[i].y + ballList[i].radius > paddel2.y && paddel2.y + paddel2. height > ballList[i].y - ballList[i].radius))
+        {
+            ballList[i].bounce(canvas.width - paddel2.width - ballList[i].radius)
+        } 
+    }
+    
+}
+
+function spawnBall()
+{
+    const newBall = new Ball();
+    ballList.push(newBall);
 }
 
 
@@ -293,6 +350,11 @@ const paddel1 = new Paddel(0);
 const paddel2 = new Paddel(canvas.width-20);
 const ball = new Ball();
 const counter = new Counter();
+
+//Start using a list for containing balls
+var ballList = [];
+ballList.push(ball);
+
 var running = false;
 var gameWon = false;
 var winner = 0;
